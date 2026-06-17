@@ -241,9 +241,8 @@ async def analyze(label_image: UploadFile = File(...)):
     except Exception as e:
         return {"error": "Failed to process image.", "details": str(e)}
 
-    print("\n========== OCR OUTPUT ==========")
+    print("\n OCR OUTPUT ")
     print(extracted_text)
-    print("================================\n")
 
     food_keywords = [
         "INGREDIENT", "INGREDIENTS", "SUGAR", "SALT", "FLOUR", "OIL", 
