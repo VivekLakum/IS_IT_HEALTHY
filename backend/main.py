@@ -1,32 +1,30 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-import easyocr
 import shutil
 import os
+import google.generativeai as genai
+from PIL import Image
+# ---------------------------
+# Configure Gemini API
+# ---------------------------
+api_key = os.environ.get("GEMINI_API_KEY")
+if api_key:
+    genai.configure(api_key=api_key)
+else:
+    print("WARNING: GEMINI_API_KEY is not set!")
 
 # ---------------------------
 # FastAPI App
 # ---------------------------
 app = FastAPI()
 
-# ---------------------------
-# CORS - Updated to allow your live frontend
-# ---------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows your Vercel frontend to seamlessly connect
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# ---------------------------
-# EasyOCR Reader
-# ---------------------------
-print("Loading EasyOCR...")
-reader = easyocr.Reader(['en'])
-print("EasyOCR Loaded Successfully")
-
 
 # ---------------------------
 # Ingredient Analysis Engine
@@ -48,7 +46,6 @@ def detect_food_category(text):
                 return category
     return "Unknown"
 
-
 def apply_category_adjustment(score, category, advisories, score_breakdown):
     adjustments = {
         "Chocolate & Confectionery": {"penalty": -2, "message": "Confectionery products are best enjoyed occasionally."},
@@ -66,23 +63,37 @@ def apply_category_adjustment(score, category, advisories, score_breakdown):
         advisories.append({
             "title": category,
             "severity": "Educational Insight",
-            "detail": adjustments[category]["message"],
+             "detail": adjustments[category]["message"],
             "linked": category
         })
     return score
 
-
 def analyze_ingredients(text):
     score = 10
     score_breakdown = [{"factor": "Base Score", "change": +10}]
-    harmful, additives, safe, processed_natural, advisories = [], [], [], [], []
+
+    harmful = []
+    additives = []
+    safe = []
+    processed_natural = []
+    advisories = []
+
     text = text.upper()
 
+    # -----------------------
+    # Harmful Ingredients
+    # -----------------------
     harmful_map = {
-        "PALMOLEIN": {"name": "Refined Palmolein", "penalty": 2, "note": "Refined oil high in saturated fat.", "advisory": {"title": "High Saturated Fat Intake", "severity": "Moderate Risk", "detail": "Frequent intake of refined oils may negatively affect cardiovascular health."}},
+        "PALMOLEIN": {
+            "name": "Refined Palmolein", "penalty": 2, "note": "Refined oil high in saturated fat.",
+            "advisory": {"title": "High Saturated Fat Intake", "severity": "Moderate Risk", "detail": "Frequent intake of refined oils may negatively affect cardiovascular health."}
+        },
         "PALM OIL": {"name": "Palm Oil", "penalty": 2, "note": "Highly processed oil."},
         "MALTODEXTRIN": {"name": "Maltodextrin", "penalty": 1, "note": "Highly processed carbohydrate."},
-        "SUGAR": {"name": "Added Sugar", "penalty": 1, "note": "Frequent intake may affect metabolic health.", "advisory": {"title": "Excess Sugar Intake", "severity": "Moderate Risk", "detail": "Frequent consumption of added sugars may contribute to poor metabolic health."}},
+        "SUGAR": {
+            "name": "Added Sugar", "penalty": 1, "note": "Frequent intake may affect metabolic health.",
+            "advisory": {"title": "Excess Sugar Intake", "severity": "Moderate Risk", "detail": "Frequent consumption of added sugars may contribute to poor metabolic health."}
+        },
         "MAIDA": {"name": "Refined Wheat Flour (Maida)", "penalty": 1, "note": "Low fibre refined flour."},
         "HYDROGENATED": {"name": "Hydrogenated Fat", "penalty": 2, "note": "Possible source of trans fats."},
         "HYDROLYZED VEGETABLE PROTEIN": {"name": "Hydrolyzed Vegetable Protein", "penalty": 0.5, "note": "Highly processed flavouring ingredient."},
@@ -95,8 +106,14 @@ def analyze_ingredients(text):
             score_breakdown.append({"factor": item["name"], "change": -item["penalty"]})
             harmful.append({"name": item["name"], "note": item["note"]})
             if "advisory" in item:
-                advisories.append({**item["advisory"], "linked": item["name"]})
+                advisories.append({
+                    "title": item["advisory"]["title"], "severity": item["advisory"]["severity"],
+                    "detail": item["advisory"]["detail"], "linked": item["name"]
+                })
 
+    # -----------------------
+    # INS Additives
+    # -----------------------
     additive_map = {
         "102": ("Tartrazine", "INS 102", "Synthetic yellow colour."),
         "110": ("Sunset Yellow", "INS 110", "Synthetic orange colour."),
@@ -135,7 +152,8 @@ def analyze_ingredients(text):
       
     additive_penalty = {
         "319": 0.5, "320": 1, "321": 1, "621": 0.5, "627": 0.5, "631": 0.5, "635": 0.5,
-        "102": 1, "110": 1, "122": 1, "124": 1, "129": 1, "133": 1, "950": 0.5, "951": 0.5, "955": 0.5
+        "102": 1, "110": 1, "122": 1, "124": 1, "129": 1, "133": 1,
+        "950": 0.5, "951": 0.5, "955": 0.5
     }
 
     for code, (name, ins_code, note) in additive_map.items():
@@ -146,6 +164,9 @@ def analyze_ingredients(text):
             if penalty > 0:
                 score_breakdown.append({"factor": f"{name} ({ins_code})", "change": -penalty})
 
+    # -----------------------
+    # Safe Ingredients
+    # -----------------------
     processed_natural_map = {
         "GARLIC POWDER": "Dehydrated garlic seasoning.",
         "RED CHILLI POWDER": "Dehydrated red chilli seasoning.",
@@ -155,21 +176,26 @@ def analyze_ingredients(text):
         "POTATO STARCH": "Refined starch ingredient.",
         "PEANUT OIL": "Processed peanut ingredient."
     }
+
     for ingredient, note in processed_natural_map.items():
         if ingredient in text:
             processed_natural.append({"name": ingredient.title(), "note": note})
 
     safe_map = {
-        "POTATO": "Whole vegetable ingredient.", "ONION": "Natural spice.", "GARLIC": "Natural spice.",
-        "TOMATO": "Natural ingredient.", "PEANUT": "Protein-rich ingredient.", "CHICKPEA": "Good source of fibre and protein.",
-        "CUMIN": "Natural spice.", "CORIANDER": "Natural spice.", "TURMERIC": "Traditional spice.",
-        "MAKHANA": "Roasted lotus seeds; naturally nutritious.", "FOX SEEDS": "Nutritious seeds.",
-        "OLIVE OIL": "Healthier fat source.", "PARSLEY": "Natural herb.", "CHILLI": "Natural spice.",
-        "OATS": "Rich in soluble fibre.", "MILLETS": "Traditional whole grains.", "RAGI": "Calcium-rich millet.",
-        "JOWAR": "Whole grain.", "BAJRA": "Fibre-rich millet.", "ALMOND": "Healthy fats and protein.",
-        "CASHEW": "Nutritious nut source.", "WALNUT": "Omega-3 source.", "HONEY": "Natural sweetener.", "JAGGERY": "Traditional sweetener."
+        "POTATO": "Whole vegetable ingredient.", "ONION": "Natural spice.",
+        "GARLIC": "Natural spice.", "TOMATO": "Natural ingredient.",
+        "PEANUT": "Protein-rich ingredient.", "CHICKPEA": "Good source of fibre and protein.",
+        "CUMIN": "Natural spice.", "CORIANDER": "Natural spice.",
+        "TURMERIC": "Traditional spice.", "MAKHANA": "Roasted lotus seeds; naturally nutritious.",
+        "FOX SEEDS": "Nutritious seeds.", "OLIVE OIL": "Healthier fat source.",
+        "PARSLEY": "Natural herb.", "CHILLI": "Natural spice.",
+        "OATS": "Rich in soluble fibre.", "MILLETS": "Traditional whole grains.",
+        "RAGI": "Calcium-rich millet.", "JOWAR": "Whole grain.",
+        "BAJRA": "Fibre-rich millet.", "ALMOND": "Healthy fats and protein.",
+        "CASHEW": "Nutritious nut source.", "WALNUT": "Omega-3 source.",
+        "HONEY": "Natural sweetener.", "JAGGERY": "Traditional sweetener."
     }
-    
+
     for ingredient, note in safe_map.items():
         skip = False
         for processed in processed_natural:
@@ -182,24 +208,48 @@ def analyze_ingredients(text):
     score = max(round(score, 1), 0)
     return score, harmful, additives, safe, processed_natural, advisories, score_breakdown
 
-
+# ---------------------------
+# Home Route
+# ---------------------------
 @app.get("/")
 def home():
     return {"message": "Backend is running"}
 
-
+# ---------------------------
+# Analyze Endpoint
+# ---------------------------
 @app.post("/api/analyze")
 async def analyze(label_image: UploadFile = File(...)):
+    if not api_key:
+        return {"error": "API key not configured on server."}
+
     os.makedirs("uploads", exist_ok=True)
     filepath = os.path.join("uploads", label_image.filename)
 
     with open(filepath, "wb") as buffer:
         shutil.copyfileobj(label_image.file, buffer)
 
-    result = reader.readtext(filepath)
-    extracted_text = " ".join([item[1] for item in result]).strip().upper()
+    # Gemini OCR Logic
+    try:
+        img = Image.open(filepath)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        response = model.generate_content([
+            "Extract all the ingredient text from this label. Only return the text.",
+            img
+        ])
+        extracted_text = response.text.strip().upper()
+    except Exception as e:
+        return {"error": "Failed to process image.", "details": str(e)}
 
-    food_keywords = ["INGREDIENT", "INGREDIENTS", "SUGAR", "SALT", "FLOUR", "OIL", "MILK", "INS", "EMULSIFIER", "FLAVOUR", "MALTODEXTRIN", "ACIDITY REGULATOR"]
+    print("\n========== OCR OUTPUT ==========")
+    print(extracted_text)
+    print("================================\n")
+
+    food_keywords = [
+        "INGREDIENT", "INGREDIENTS", "SUGAR", "SALT", "FLOUR", "OIL", 
+        "MILK", "INS", "EMULSIFIER", "FLAVOUR", "MALTODEXTRIN", "ACIDITY REGULATOR"
+    ]
+
     matches = sum(keyword in extracted_text for keyword in food_keywords)
 
     if matches < 2:
@@ -208,6 +258,7 @@ async def analyze(label_image: UploadFile = File(...)):
             "message": "Please upload a clear photo of a food ingredient list."
         }
 
+    # Ingredient Analysis
     category = detect_food_category(extracted_text)
     score, harmful, additives, safe, processed_natural, advisories, score_breakdown = analyze_ingredients(extracted_text)
     score = apply_category_adjustment(score, category, advisories, score_breakdown)
