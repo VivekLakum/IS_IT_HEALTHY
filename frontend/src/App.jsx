@@ -789,7 +789,7 @@ export default function App() {
     form.append("cost_per_packet", String(costPerPacket));
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/analyze", { method: "POST", body: form });
+      const res = await fetch("https://is-it-healthy-2.onrender.com/api/analyze", { method: "POST", body: form });
       if (!res.ok) throw new Error("Server responded with an error");
       const data = await res.json();
       if (data.error) {
