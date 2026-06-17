@@ -6,3 +6,8 @@ pillow
 numpy
 torch
 torchvision
+fastapi
+uvicorn
+python-multipart
+google-generativeai
+pillow
