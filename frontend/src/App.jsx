@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Tesseract from "tesseract.js";
 import {
   UploadCloud,
   X,
@@ -777,40 +778,69 @@ export default function App() {
    * feels alive. See the chat reply for the axios version of this call.
    */
   async function handleAnalyze() {
-    if (!file && !productName.trim()) {
-      setBanner("Add a label photo or type a product name first.");
-      return;
-    }
-    setLoading(true);
-    const form = new FormData();
-    if (file) form.append("label_image", file);
-    form.append("product_name", productName);
-    form.append("packets_per_week", String(packets));
-    form.append("cost_per_packet", String(costPerPacket));
 
-    try {
-      const res = await fetch("https://is-it-healthy-2.onrender.com/api/analyze", { method: "POST", body: form });
-      if (!res.ok) throw new Error("Server responded with an error");
-      const data = await res.json();
-      if (data.error) {
-          setError(data.message);
-          setResult(data);   // so AuditTab can show the message
-          return;
+if (!file) {
+setBanner("Please upload an ingredient label image.");
+return;
 }
 
-       setError(null);
-      setResult(data);
-      setActiveTab("audit");
-    } catch (err) {
-      console.error(err);
-      setResult({
-        message: "No valid ingredient label detected. Please upload a clear photo of the ingredients section.",
-      });
-      setActiveTab("audit");
-    } finally {
-      setLoading(false);
-    }
-  }
+setLoading(true);
+
+try {
+const ocrResult = await Tesseract.recognize(
+  file,
+  "eng"
+);
+
+const extractedText = ocrResult.data.text;
+
+console.log("OCR TEXT:", extractedText);
+
+const apiUrl =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:8000/api/analyze";
+
+const res = await fetch(apiUrl, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    text: extractedText
+  })
+});
+
+if (!res.ok) {
+  throw new Error("Server responded with an error");
+}
+
+const data = await res.json();
+
+if (data.error) {
+  setError(data.message);
+  setResult(data);
+  return;
+}
+
+setError(null);
+setResult(data);
+setActiveTab("audit");
+
+
+} catch (err) {
+
+
+console.error(err);
+
+setResult({
+  message: "Failed to analyze image."
+});
+
+} finally {
+setLoading(false);
+}
+}
+
 
   const tabs = [
     { id: "audit", label: "📋 Ingredient Audit" },
