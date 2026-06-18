@@ -797,8 +797,7 @@ const extractedText = ocrResult.data.text;
 console.log("OCR TEXT:", extractedText);
 
 const apiUrl =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:8000/api/analyze";
+  "https://is-it-healthy-backend.onrender.com/api/analyze";
 
 const res = await fetch(apiUrl, {
   method: "POST",
