@@ -245,7 +245,10 @@ def parse_nutrition_text(text: str) -> dict:
     return {k: v for k, v in nutrition.items() if v is not None}
 
 
-def compute_nutrition_analysis(nutrition: dict) -> dict:
+def compute_nutrition_analysis(
+    nutrition: dict,
+    category: str = "Unknown"
+) -> dict:
     """Compare parsed nutrition values against safe limits, compute excess and risk score."""
     concerns = []
     score = 10.0
