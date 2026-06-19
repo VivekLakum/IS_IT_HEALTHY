@@ -1213,7 +1213,7 @@ function SwapsTab({ ingredientResult, packets, costPerPacket }) {
 /* ═══════════════════════════════════════════════════════════════════════════
    MAIN APP WITH CLIENT-SIDE LIFECYCLE
 ══════════════════════════════════════════════════════════════════════════════ */
-const API_BASE = "http://localhost:8000";
+const API_BASE = "https://is-it-healthy-backend.onrender.com";
 export default function App() {
   const [theme, setTheme] = useState("dark");
   const [activeTab, setActiveTab] = useState("audit");
