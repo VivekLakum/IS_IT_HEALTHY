@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from matplotlib import category
 from pydantic import BaseModel
 import re
 
@@ -25,6 +26,8 @@ class ManualNutritionRequest(BaseModel):
     saturated_fat: float = 0
     trans_fat: float = 0
     sodium: float = 0
+    serving_size: float = 100
+    is_per_100g: bool = True
 
 # ---------------------------
 # CORS
@@ -247,6 +250,21 @@ def compute_nutrition_analysis(nutrition: dict) -> dict:
     """Compare parsed nutrition values against safe limits, compute excess and risk score."""
     concerns = []
     score = 10.0
+    # Low protein
+    if nutrition.get("protein", 0) < 5:
+        score -= 1
+
+# Low fibre
+    if nutrition.get("fiber", 0) < 3:
+        score -= 1
+
+# Very high calorie density
+    if nutrition.get("calories", 0) > 500:
+        score -= 2
+
+# Fried snack category
+    if category == "Chips & Fried Snacks":
+        score -= 1.5
     score_breakdown = [{"factor": "Base Score", "change": 10}]
 
     penalty_map = {
@@ -265,11 +283,13 @@ def compute_nutrition_analysis(nutrition: dict) -> dict:
         if detected is None or safe_limit is None:
             continue
 
+        weight = meta.get("weight", 1.0)
+
         if safe_limit == 0:
             # Trans fat — any amount is penalised
             if detected > 0:
                 excess_pct = 100
-                penalty = meta["weight"] * min(detected, 3)
+                penalty = weight * min(detected, 3)
                 score -= penalty
                 score_breakdown.append({"factor": meta["label"], "change": -round(penalty, 1)})
                 concerns.append({
@@ -282,7 +302,15 @@ def compute_nutrition_analysis(nutrition: dict) -> dict:
                 })
         elif detected > safe_limit:
             excess_pct = round(((detected - safe_limit) / safe_limit) * 100, 1)
-            penalty = meta["weight"] * (excess_pct / 100)
+            # penalty = weight * (excess_pct / 100)
+            if excess_pct <= 20:
+                penalty = weight * 0.5
+            elif excess_pct <= 50:
+                penalty = weight * 1.5  
+            elif excess_pct <= 100:
+                penalty = weight * 3
+            else:
+                penalty = weight * 5
             score -= penalty
             score_breakdown.append({"factor": meta["label"], "change": -round(penalty, 1)})
             unit = "mg" if key == "sodium" else "g"
@@ -442,7 +470,7 @@ async def analyze(data: IngredientRequest):
 # ---------------------------
 # Nutrition Analysis Endpoint
 # ---------------------------
-@app.post("/api/analyze-nutrition")
+# @app.post("/api/analyze-nutrition")
 async def analyze_nutrition(data: NutritionRequest):
     extracted_text = data.text.strip()
     print("\n========== NUTRITION OCR ==========")
@@ -509,6 +537,13 @@ async def manual_nutrition(data: ManualNutritionRequest):
         "trans_fat":     safe_float(data.trans_fat),
         "sodium":        safe_float(data.sodium),
     }
+    if data.is_per_100g and data.serving_size > 0:
+        factor = data.serving_size / 100
+    else:
+        factor = 1
+
+    for key in nutrition:
+        nutrition[key] *= factor
 
     # Strip keys with zero values so compute_nutrition_analysis
     # skips them (same behaviour as OCR-parsed results with missing fields)
