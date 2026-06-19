@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from matplotlib import category
 from pydantic import BaseModel
 import re
 
