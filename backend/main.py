@@ -1,7 +1,11 @@
+import json
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+# from matplotlib import category
 from pydantic import BaseModel
 import re
+
 
 # ---------------------------
 # FastAPI App
@@ -33,13 +37,43 @@ class ManualNutritionRequest(BaseModel):
 # ---------------------------
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=["*"],
-    allow_origin_regex=r"https://.*\.vercel\.app",
-
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ---------------------------
+# Robust JSON Database Loader
+# ---------------------------
+# REFACTOR MODIFICATION: Set up dynamic path resolution for the data directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+
+# REFACTOR MODIFICATION: Added robust JSON loader utility function to handle file operations safely
+def load_json(filename):
+    path = os.path.join(DATA_DIR, filename)
+    if not os.path.exists(path):
+        print(f"Missing file: {path}")
+        return {}
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Error loading {filename}: {e}")
+        return {}
+
+# REFACTOR MODIFICATION: Load all external knowledge bases into memory at startup
+HARMFUL_DB = load_json("harmful_ingredients.json")
+SAFE_DB = load_json("safe_ingredients.json")
+PROCESSED_DB = load_json("processed_ingredients.json")
+ADDITIVE_DB = load_json("additives.json")
+FOOD_CATEGORIES = load_json("food_categories.json")
+HEALTH_ADVISORIES = load_json("health_advisories.json")
 
 # ---------------------------
 # Safe Limits (per serving)
@@ -62,16 +96,9 @@ SAFE_LIMITS = {
 # ---------------------------
 def detect_food_category(text):
     text = text.upper()
-    categories = {
-        "Chocolate & Confectionery": ["CHOCOLATE", "COCOA", "COCOA MASS", "COCOA BUTTER", "KITKAT", "WAFER"],
-        "Chips & Fried Snacks": ["POTATO", "PALMOLEIN", "CHIPS", "NAMKEEN", "KURKURE", "BINGO"],
-        "Instant Noodles": ["NOODLES", "TASTEMAKER", "MAGGI", "RAMEN"],
-        "Makhana Snacks": ["MAKHANA", "FOX NUT"],
-        "Protein/Nut Snacks": ["PEANUT", "ALMOND", "CASHEW", "CHICKPEA", "ROASTED CHANA"],
-        "Biscuits & Cookies": ["BISCUIT", "COOKIE", "CREAM-FILLED", "WHEAT FLOUR"],
-        "Soft Drinks": ["CARBONATED", "SODA", "SOFT DRINK", "COLA"],
-    }
-    for category, keywords in categories.items():
+    
+    # REFACTOR MODIFICATION: Replaced the hardcoded categories dictionary with external FOOD_CATEGORIES database
+    for category, keywords in FOOD_CATEGORIES.items():
         for keyword in keywords:
             if keyword in text:
                 return category
@@ -106,100 +133,96 @@ def analyze_ingredients(text):
     score_breakdown = [{"factor": "Base Score", "change": +10}]
     harmful, additives, safe, processed_natural, advisories = [], [], [], [], []
     text = text.upper()
+    ingredients_list = []
+    try:
+        ingredients_list = [
+            x.strip()
+            for x in re.split(r"[,\n]", text)
+            if x.strip()
+        ]
+    except Exception:
+        ingredients_list = []
 
-    harmful_map = {
-        "PALMOLEIN": {"name": "Refined Palmolein", "penalty": 2, "note": "Refined oil high in saturated fat.", "advisory": {"title": "High Saturated Fat Intake", "severity": "Moderate Risk", "detail": "Frequent intake of refined oils may negatively affect cardiovascular health."}},
-        "PALM OIL": {"name": "Palm Oil", "penalty": 2, "note": "Highly processed oil."},
-        "MALTODEXTRIN": {"name": "Maltodextrin", "penalty": 1, "note": "Highly processed carbohydrate."},
-        "SUGAR": {"name": "Added Sugar", "penalty": 1, "note": "Frequent intake may affect metabolic health.", "advisory": {"title": "Excess Sugar Intake", "severity": "Moderate Risk", "detail": "Frequent consumption of added sugars may contribute to poor metabolic health."}},
-        "MAIDA": {"name": "Refined Wheat Flour (Maida)", "penalty": 1, "note": "Low fibre refined flour."},
-        "HYDROGENATED": {"name": "Hydrogenated Fat", "penalty": 2, "note": "Possible source of trans fats."},
-        "HYDROLYZED VEGETABLE PROTEIN": {"name": "Hydrolyzed Vegetable Protein", "penalty": 0.5, "note": "Highly processed flavouring ingredient."},
-        "NATURE IDENTICAL": {"name": "Nature Identical Flavours", "penalty": 0.5, "note": "Synthetic flavour compounds."},
-    }
+    top3 = " ".join(ingredients_list[:3])
+
+    if "SUGAR" in top3:
+        score -= 2
+        score_breakdown.append({
+            "factor": "Sugar in Top 3 Ingredients",
+            "change": -2
+        })
+
+    if "PALM OIL" in top3:
+        score -= 1
+        score_breakdown.append({
+            "factor": "Palm Oil in Top 3 Ingredients",
+            "change": -1
+        })
+
+    # REFACTOR MODIFICATION: Swapped the hardcoded harmful dictionary out for HARMFUL_DB
+    harmful_map = HARMFUL_DB or {}
 
     for keyword, item in harmful_map.items():
         if keyword in text:
-            score -= item["penalty"]
-            score_breakdown.append({"factor": item["name"], "change": -item["penalty"]})
-            harmful.append({"name": item["name"], "note": item["note"]})
-            if "advisory" in item:
-                advisories.append({**item["advisory"], "linked": item["name"]})
 
-    additive_map = {
-        "102": ("Tartrazine", "INS 102", "Synthetic yellow colour."),
-        "110": ("Sunset Yellow", "INS 110", "Synthetic orange colour."),
-        "122": ("Carmoisine", "INS 122", "Synthetic red colour."),
-        "124": ("Ponceau 4R", "INS 124", "Synthetic red colour."),
-        "129": ("Allura Red", "INS 129", "Synthetic red colour."),
-        "133": ("Brilliant Blue", "INS 133", "Synthetic blue colour."),
-        "150": ("Caramel Colour", "INS 150", "Food colouring."),
-        "200": ("Sorbic Acid", "INS 200", "Preservative."),
-        "202": ("Potassium Sorbate", "INS 202", "Preservative."),
-        "211": ("Sodium Benzoate", "INS 211", "Preservative."),
-        "223": ("Sodium Metabisulphite", "INS 223", "Preservative."),
-        "296": ("Malic Acid", "INS 296", "Acidity regulator."),
-        "330": ("Citric Acid", "INS 330", "Acidity regulator."),
-        "331": ("Sodium Citrate", "INS 331", "Acidity regulator."),
-        "334": ("Tartaric Acid", "INS 334", "Acidity regulator."),
-        "319": ("TBHQ", "INS 319", "Synthetic antioxidant."),
-        "320": ("BHA", "INS 320", "Synthetic antioxidant."),
-        "321": ("BHT", "INS 321", "Synthetic antioxidant."),
-        "322": ("Lecithin", "INS 322", "Emulsifier."),
-        "471": ("Mono and Diglycerides", "INS 471", "Emulsifier."),
-        "476": ("PGPR", "INS 476", "Emulsifier."),
-        "500": ("Sodium Carbonate", "INS 500", "Raising agent."),
-        "503": ("Ammonium Carbonate", "INS 503", "Raising agent."),
-        "508": ("Potassium Chloride", "INS 508", "Flavour enhancer."),
-        "551": ("Silicon Dioxide", "INS 551", "Anti-caking agent."),
-        "621": ("MSG", "INS 621", "Flavour enhancer."),
-        "627": ("Disodium Guanylate", "INS 627", "Flavour enhancer."),
-        "631": ("Disodium Inosinate", "INS 631", "Flavour enhancer."),
-        "635": ("Disodium 5-ribonucleotides", "INS 635", "Flavour enhancer."),
-        "950": ("Acesulfame K", "INS 950", "Artificial sweetener."),
-        "951": ("Aspartame", "INS 951", "Artificial sweetener."),
-        "955": ("Sucralose", "INS 955", "Artificial sweetener."),
-        "960": ("Stevia", "INS 960", "Natural sweetener."),
-    }
-    additive_penalty = {
-        "319": 0.5, "320": 1, "321": 1,
-        "621": 0.5, "627": 0.5, "631": 0.5, "635": 0.5,
-        "102": 1, "110": 1, "122": 1, "124": 1, "129": 1, "133": 1,
-        "950": 0.5, "951": 0.5, "955": 0.5,
-    }
+            penalty = item.get("penalty", 0)
+            name = item.get("name", keyword)
+            note = item.get("note", "")
+
+            score -= penalty
+
+            score_breakdown.append({
+                "factor": name,
+                "change": -penalty
+            })
+
+            harmful.append({
+                "name": name,
+                "note": note
+            })
+
+            advisory = item.get("advisory")
+            if advisory:
+                advisories.append({
+                    **advisory,
+                    "linked": name
+                })
+
+    # REFACTOR MODIFICATION: Dynamically populate additive_map and additive_penalty maps using the new ADDITIVE_DB JSON layout
+    additive_map = {}
+    additive_penalty = {}
+    for code, info in (ADDITIVE_DB or {}).items():
+        additive_map[code] = (info.get("name", ""), info.get("code", ""), info.get("note", ""))
+        if "penalty" in info:
+            additive_penalty[code] = info["penalty"]
 
     for code, (name, ins_code, note) in additive_map.items():
         if code in text:
-            additives.append({"name": name, "code": ins_code, "note": note})
-            penalty = additive_penalty.get(code, 0)
-            score -= penalty
-            if penalty > 0:
-                score_breakdown.append({"factor": f"{name} ({ins_code})", "change": -penalty})
 
-    processed_natural_map = {
-        "GARLIC POWDER": "Dehydrated garlic seasoning.",
-        "RED CHILLI POWDER": "Dehydrated red chilli seasoning.",
-        "ONION POWDER": "Dehydrated onion seasoning.",
-        "TOMATO POWDER": "Processed tomato ingredient.",
-        "MILK SOLIDS": "Processed dairy ingredient.",
-        "POTATO STARCH": "Refined starch ingredient.",
-        "PEANUT OIL": "Processed peanut ingredient.",
-    }
+            penalty = additive_penalty.get(code, 0)
+
+            additives.append({
+                "name": name,
+                "code": ins_code,
+                "note": note
+            })
+
+            score -= penalty
+
+            if penalty > 0:
+                score_breakdown.append({
+                    "factor": f"{name} ({ins_code})",
+                    "change": -penalty
+                })
+
+    # REFACTOR MODIFICATION: Replaced hardcoded processed ingredients mapping with data parsed from PROCESSED_DB
+    processed_natural_map = {k: v.get("note", "") for k, v in (PROCESSED_DB or {}).items()}
     for ingredient, note in processed_natural_map.items():
         if ingredient in text:
             processed_natural.append({"name": ingredient.title(), "note": note})
 
-    safe_map = {
-        "POTATO": "Whole vegetable ingredient.", "ONION": "Natural spice.", "GARLIC": "Natural spice.",
-        "TOMATO": "Natural ingredient.", "PEANUT": "Protein-rich ingredient.",
-        "CHICKPEA": "Good source of fibre and protein.", "CUMIN": "Natural spice.",
-        "CORIANDER": "Natural spice.", "TURMERIC": "Traditional spice.",
-        "MAKHANA": "Roasted lotus seeds; naturally nutritious.", "OLIVE OIL": "Healthier fat source.",
-        "CHILLI": "Natural spice.", "OATS": "Rich in soluble fibre.", "MILLETS": "Traditional whole grains.",
-        "RAGI": "Calcium-rich millet.", "JOWAR": "Whole grain.", "BAJRA": "Fibre-rich millet.",
-        "ALMOND": "Healthy fats and protein.", "CASHEW": "Nutritious nut source.",
-        "WALNUT": "Omega-3 source.", "HONEY": "Natural sweetener.", "JAGGERY": "Traditional sweetener.",
-    }
+    # REFACTOR MODIFICATION: Replaced hardcoded safe ingredients mapping with data parsed from SAFE_DB
+    safe_map = {k: v.get("note", "") for k, v in (SAFE_DB or {}).items()}
     for ingredient, note in safe_map.items():
         skip = any(ingredient.upper() in p["name"].upper() for p in processed_natural)
         if not skip and ingredient in text:
@@ -238,8 +261,11 @@ def parse_nutrition_text(text: str) -> dict:
         "sugar":          extract_value([r"(?:TOTAL\s*)?SUGARS?\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*G"]),
         "added_sugar":    extract_value([r"ADDED\s*SUGARS?\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*G"]),
         "protein":        extract_value([r"PROTEIN\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*G"]),
-        "fiber":          extract_value([r"DIETARY\s*FIBE?R\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*G", r"FIBRE?\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*G"]),
         "sodium":         extract_value([r"SODIUM\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*MG"]),
+        "fiber": extract_value([
+    r"DIETARY\s*FIBE?R\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*G",
+    r"FIBRE?\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*G"
+])
     }
     return {k: v for k, v in nutrition.items() if v is not None}
 
@@ -255,15 +281,15 @@ def compute_nutrition_analysis(
     if nutrition.get("protein", 0) < 5:
         score -= 1
 
-# Low fibre
+    # Low fibre
     if nutrition.get("fiber", 0) < 3:
         score -= 1
 
-# Very high calorie density
+    # Very high calorie density
     if nutrition.get("calories", 0) > 500:
         score -= 2
 
-# Fried snack category
+    # Fried snack category
     if category == "Chips & Fried Snacks":
         score -= 1.5
     score_breakdown = [{"factor": "Base Score", "change": 10}]
@@ -303,7 +329,6 @@ def compute_nutrition_analysis(
                 })
         elif detected > safe_limit:
             excess_pct = round(((detected - safe_limit) / safe_limit) * 100, 1)
-            # penalty = weight * (excess_pct / 100)
             if excess_pct <= 20:
                 penalty = weight * 0.5
             elif excess_pct <= 50:
