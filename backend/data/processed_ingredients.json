@@ -1,0 +1,213 @@
+{
+  "MILK SOLIDS": {
+    "note": "Processed dairy ingredient."
+  },
+
+  "MILK POWDER": {
+    "note": "Dehydrated dairy ingredient."
+  },
+
+  "SKIMMED MILK POWDER": {
+    "note": "Processed dairy ingredient."
+  },
+
+  "WHEY POWDER": {
+    "note": "Processed dairy ingredient."
+  },
+
+  "ONION POWDER": {
+    "note": "Dehydrated onion seasoning."
+  },
+
+  "GARLIC POWDER": {
+    "note": "Dehydrated garlic seasoning."
+  },
+
+  "TOMATO POWDER": {
+    "note": "Processed tomato ingredient."
+  },
+
+  "BEETROOT POWDER": {
+    "note": "Processed vegetable powder."
+  },
+
+  "SPINACH POWDER": {
+    "note": "Processed vegetable powder."
+  },
+
+  "POTATO STARCH": {
+    "note": "Refined starch ingredient."
+  },
+
+  "CORN STARCH": {
+    "note": "Refined starch ingredient."
+  },
+
+  "MODIFIED STARCH": {
+    "note": "Modified starch ingredient."
+  },
+
+  "MODIFIED CORN STARCH": {
+    "note": "Processed starch ingredient."
+  },
+
+  "MODIFIED FOOD STARCH": {
+    "note": "Processed starch ingredient."
+  },
+
+  "TAPIOCA STARCH": {
+    "note": "Refined starch ingredient."
+  },
+
+  "RICE FLOUR": {
+    "note": "Processed grain ingredient."
+  },
+
+  "WHEAT FLOUR": {
+    "note": "Processed grain ingredient."
+  },
+
+  "WHOLE WHEAT FLOUR": {
+    "note": "Ground grain ingredient."
+  },
+
+  "OAT FLOUR": {
+    "note": "Processed oat ingredient."
+  },
+
+  "SOY PROTEIN": {
+    "note": "Isolated protein ingredient."
+  },
+
+  "SOY PROTEIN ISOLATE": {
+    "note": "Highly processed protein ingredient."
+  },
+
+  "PEA PROTEIN": {
+    "note": "Protein concentrate."
+  },
+
+  "PEA PROTEIN ISOLATE": {
+    "note": "Highly processed protein ingredient."
+  },
+
+  "WHEY PROTEIN": {
+    "note": "Protein concentrate."
+  },
+
+  "MILK PROTEIN": {
+    "note": "Protein concentrate."
+  },
+
+  "CASEIN": {
+    "note": "Milk protein extract."
+  },
+
+  "COCOA POWDER": {
+    "note": "Processed cocoa ingredient."
+  },
+
+  "COCOA SOLIDS": {
+    "note": "Processed cocoa component."
+  },
+
+  "COCOA MASS": {
+    "note": "Processed cocoa ingredient."
+  },
+
+  "COCOA BUTTER": {
+    "note": "Extracted cocoa fat."
+  },
+
+  "PEANUT BUTTER": {
+    "note": "Processed peanut ingredient."
+  },
+
+  "ALMOND BUTTER": {
+    "note": "Processed nut ingredient."
+  },
+
+  "CASHEW BUTTER": {
+    "note": "Processed nut ingredient."
+  },
+
+  "DATE PASTE": {
+    "note": "Processed fruit ingredient."
+  },
+
+  "FRUIT CONCENTRATE": {
+    "note": "Concentrated fruit ingredient."
+  },
+
+  "APPLE CONCENTRATE": {
+    "note": "Concentrated fruit ingredient."
+  },
+
+  "GRAPE CONCENTRATE": {
+    "note": "Concentrated fruit ingredient."
+  },
+
+  "LEMON JUICE CONCENTRATE": {
+    "note": "Concentrated fruit ingredient."
+  },
+
+  "ORANGE JUICE CONCENTRATE": {
+    "note": "Concentrated fruit ingredient."
+  },
+
+  "DEHYDRATED VEGETABLES": {
+    "note": "Processed vegetable ingredient."
+  },
+
+  "DEHYDRATED ONION": {
+    "note": "Processed vegetable ingredient."
+  },
+
+  "DEHYDRATED GARLIC": {
+    "note": "Processed vegetable ingredient."
+  },
+
+  "VEGETABLE POWDER": {
+    "note": "Processed vegetable ingredient."
+  },
+
+  "MALT EXTRACT": {
+    "note": "Processed grain extract."
+  },
+
+  "BARLEY MALT": {
+    "note": "Processed grain ingredient."
+  },
+
+  "MALTED BARLEY": {
+    "note": "Processed grain ingredient."
+  },
+
+  "YEAST EXTRACT": {
+    "note": "Processed flavour ingredient."
+  },
+
+  "VEGETABLE EXTRACT": {
+    "note": "Processed plant extract."
+  },
+
+  "HERB EXTRACT": {
+    "note": "Processed herb extract."
+  },
+
+  "SPICE EXTRACT": {
+    "note": "Processed spice extract."
+  },
+
+  "ROSEMARY EXTRACT": {
+    "note": "Processed plant extract."
+  },
+
+  "GREEN TEA EXTRACT": {
+    "note": "Processed plant extract."
+  },
+
+  "COFFEE EXTRACT": {
+    "note": "Processed coffee ingredient."
+  }
+}

@@ -1,0 +1,288 @@
+{
+  "102": {
+    "name": "Tartrazine",
+    "code": "INS 102",
+    "penalty": 1,
+    "note": "Synthetic yellow colour."
+  },
+
+  "110": {
+    "name": "Sunset Yellow",
+    "code": "INS 110",
+    "penalty": 1,
+    "note": "Synthetic orange colour."
+  },
+
+  "122": {
+    "name": "Carmoisine",
+    "code": "INS 122",
+    "penalty": 1,
+    "note": "Synthetic red colour."
+  },
+
+  "124": {
+    "name": "Ponceau 4R",
+    "code": "INS 124",
+    "penalty": 1,
+    "note": "Synthetic red colour."
+  },
+
+  "129": {
+    "name": "Allura Red",
+    "code": "INS 129",
+    "penalty": 1,
+    "note": "Synthetic red colour."
+  },
+
+  "133": {
+    "name": "Brilliant Blue",
+    "code": "INS 133",
+    "penalty": 1,
+    "note": "Synthetic blue colour."
+  },
+
+  "150": {
+    "name": "Caramel Colour",
+    "code": "INS 150",
+    "penalty": 0.5,
+    "note": "Food colouring."
+  },
+
+  "200": {
+    "name": "Sorbic Acid",
+    "code": "INS 200",
+    "penalty": 0.5,
+    "note": "Preservative."
+  },
+
+  "202": {
+    "name": "Potassium Sorbate",
+    "code": "INS 202",
+    "penalty": 0.5,
+    "note": "Preservative."
+  },
+
+  "211": {
+    "name": "Sodium Benzoate",
+    "code": "INS 211",
+    "penalty": 1,
+    "note": "Preservative."
+  },
+
+  "223": {
+    "name": "Sodium Metabisulphite",
+    "code": "INS 223",
+    "penalty": 1,
+    "note": "Preservative."
+  },
+
+  "270": {
+    "name": "Lactic Acid",
+    "code": "INS 270",
+    "penalty": 0,
+    "note": "Acidity regulator."
+  },
+
+  "296": {
+    "name": "Malic Acid",
+    "code": "INS 296",
+    "penalty": 0,
+    "note": "Acidity regulator."
+  },
+
+  "319": {
+    "name": "TBHQ",
+    "code": "INS 319",
+    "penalty": 0.5,
+    "note": "Synthetic antioxidant."
+  },
+
+  "320": {
+    "name": "BHA",
+    "code": "INS 320",
+    "penalty": 1,
+    "note": "Synthetic antioxidant."
+  },
+
+  "321": {
+    "name": "BHT",
+    "code": "INS 321",
+    "penalty": 1,
+    "note": "Synthetic antioxidant."
+  },
+
+  "322": {
+    "name": "Lecithin",
+    "code": "INS 322",
+    "penalty": 0,
+    "note": "Emulsifier."
+  },
+
+  "330": {
+    "name": "Citric Acid",
+    "code": "INS 330",
+    "penalty": 0,
+    "note": "Acidity regulator."
+  },
+
+  "331": {
+    "name": "Sodium Citrate",
+    "code": "INS 331",
+    "penalty": 0,
+    "note": "Acidity regulator."
+  },
+
+  "334": {
+    "name": "Tartaric Acid",
+    "code": "INS 334",
+    "penalty": 0,
+    "note": "Acidity regulator."
+  },
+
+  "414": {
+    "name": "Gum Arabic",
+    "code": "INS 414",
+    "penalty": 0,
+    "note": "Stabilizer."
+  },
+
+  "415": {
+    "name": "Xanthan Gum",
+    "code": "INS 415",
+    "penalty": 0.5,
+    "note": "Thickener."
+  },
+
+  "440": {
+    "name": "Pectin",
+    "code": "INS 440",
+    "penalty": 0,
+    "note": "Gelling agent."
+  },
+
+  "442": {
+    "name": "Ammonium Phosphatides",
+    "code": "INS 442",
+    "penalty": 0.5,
+    "note": "Emulsifier."
+  },
+
+  "450": {
+    "name": "Diphosphates",
+    "code": "INS 450",
+    "penalty": 0.5,
+    "note": "Raising agent."
+  },
+
+  "452": {
+    "name": "Polyphosphates",
+    "code": "INS 452",
+    "penalty": 0.5,
+    "note": "Stabilizer."
+  },
+
+  "466": {
+    "name": "CMC",
+    "code": "INS 466",
+    "penalty": 0.5,
+    "note": "Thickener."
+  },
+
+  "471": {
+    "name": "Mono and Diglycerides",
+    "code": "INS 471",
+    "penalty": 0.5,
+    "note": "Emulsifier."
+  },
+
+  "476": {
+    "name": "PGPR",
+    "code": "INS 476",
+    "penalty": 0.5,
+    "note": "Emulsifier."
+  },
+
+  "500": {
+    "name": "Sodium Carbonate",
+    "code": "INS 500",
+    "penalty": 0,
+    "note": "Raising agent."
+  },
+
+  "503": {
+    "name": "Ammonium Carbonate",
+    "code": "INS 503",
+    "penalty": 0,
+    "note": "Raising agent."
+  },
+
+  "508": {
+    "name": "Potassium Chloride",
+    "code": "INS 508",
+    "penalty": 0,
+    "note": "Flavour enhancer."
+  },
+
+  "551": {
+    "name": "Silicon Dioxide",
+    "code": "INS 551",
+    "penalty": 0,
+    "note": "Anti-caking agent."
+  },
+
+  "621": {
+    "name": "MSG",
+    "code": "INS 621",
+    "penalty": 0.5,
+    "note": "Flavour enhancer."
+  },
+
+  "627": {
+    "name": "Disodium Guanylate",
+    "code": "INS 627",
+    "penalty": 0.5,
+    "note": "Flavour enhancer."
+  },
+
+  "631": {
+    "name": "Disodium Inosinate",
+    "code": "INS 631",
+    "penalty": 0.5,
+    "note": "Flavour enhancer."
+  },
+
+  "635": {
+    "name": "Disodium Ribonucleotides",
+    "code": "INS 635",
+    "penalty": 0.5,
+    "note": "Flavour enhancer."
+  },
+
+  "950": {
+    "name": "Acesulfame K",
+    "code": "INS 950",
+    "penalty": 0.5,
+    "note": "Artificial sweetener."
+  },
+
+  "951": {
+    "name": "Aspartame",
+    "code": "INS 951",
+    "penalty": 0.5,
+    "note": "Artificial sweetener."
+  },
+
+  "955": {
+    "name": "Sucralose",
+    "code": "INS 955",
+    "penalty": 0.5,
+    "note": "Artificial sweetener."
+  },
+
+  "960": {
+    "name": "Stevia",
+    "code": "INS 960",
+    "penalty": 0,
+    "note": "Natural sweetener."
+  }
+}

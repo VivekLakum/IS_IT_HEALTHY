@@ -1,0 +1,64 @@
+{
+  "SUGAR": {"name":"Added Sugar","penalty":1,"note":"Added sugar."},
+  "GLUCOSE SYRUP": {"name":"Glucose Syrup","penalty":1.5,"note":"Refined sweetener."},
+  "CORN SYRUP": {"name":"Corn Syrup","penalty":1.5,"note":"Refined sweetener."},
+  "HIGH FRUCTOSE CORN SYRUP": {"name":"HFCS","penalty":2,"note":"Highly processed sweetener."},
+  "FRUCTOSE": {"name":"Added Fructose","penalty":1,"note":"Added sweetener."},
+  "DEXTROSE": {"name":"Dextrose","penalty":1,"note":"Refined sugar."},
+  "INVERT SYRUP": {"name":"Invert Syrup","penalty":1.5,"note":"Refined sugar syrup."},
+  "MALTODEXTRIN": {"name":"Maltodextrin","penalty":1,"note":"Highly processed carbohydrate."},
+  "LIQUID GLUCOSE": {"name":"Liquid Glucose","penalty":1.5,"note":"Refined sweetener."},
+  "ARTIFICIAL SWEETENER": {"name":"Artificial Sweetener","penalty":1,"note":"Artificial sweetener."},
+
+  "PALM OIL": {"name":"Palm Oil","penalty":2,"note":"Highly processed oil."},
+  "PALMOLEIN": {"name":"Refined Palmolein","penalty":2,"note":"Refined oil."},
+  "VEGETABLE FAT": {"name":"Vegetable Fat","penalty":1,"note":"Refined fat."},
+  "HYDROGENATED FAT": {"name":"Hydrogenated Fat","penalty":2,"note":"Possible trans fats."},
+  "PARTIALLY HYDROGENATED": {"name":"Partially Hydrogenated Fat","penalty":2,"note":"Trans fat source."},
+  "SHORTENING": {"name":"Shortening","penalty":1.5,"note":"Processed fat."},
+
+  "MAIDA": {"name":"Refined Wheat Flour","penalty":1,"note":"Low fibre flour."},
+  "REFINED WHEAT FLOUR": {"name":"Refined Wheat Flour","penalty":1,"note":"Low fibre flour."},
+  "MODIFIED STARCH": {"name":"Modified Starch","penalty":0.5,"note":"Highly processed starch."},
+  "MODIFIED CORN STARCH": {"name":"Modified Corn Starch","penalty":0.5,"note":"Processed starch."},
+  "MODIFIED FOOD STARCH": {"name":"Modified Food Starch","penalty":0.5,"note":"Processed starch."},
+
+  "ARTIFICIAL FLAVOUR": {"name":"Artificial Flavour","penalty":1,"note":"Synthetic flavour."},
+  "ARTIFICIAL FLAVOURING": {"name":"Artificial Flavouring","penalty":1,"note":"Synthetic flavour."},
+  "NATURE IDENTICAL": {"name":"Nature Identical Flavour","penalty":0.5,"note":"Synthetic flavour compound."},
+  "VANILLIN": {"name":"Vanillin","penalty":0.5,"note":"Artificial vanilla flavour."},
+
+  "COLOUR": {"name":"Artificial Colour","penalty":0.5,"note":"Added colouring agent."},
+  "SYNTHETIC FOOD COLOUR": {"name":"Synthetic Food Colour","penalty":1,"note":"Artificial colouring."},
+
+  "HYDROLYZED VEGETABLE PROTEIN": {"name":"Hydrolyzed Vegetable Protein","penalty":0.5,"note":"Processed flavour ingredient."},
+  "YEAST EXTRACT": {"name":"Yeast Extract","penalty":0.5,"note":"Processed flavour enhancer."},
+
+  "WHEY POWDER": {"name":"Whey Powder","penalty":0.5,"note":"Processed dairy ingredient."},
+  "MILK POWDER": {"name":"Milk Powder","penalty":0.5,"note":"Processed dairy ingredient."},
+  "SKIMMED MILK POWDER": {"name":"Skimmed Milk Powder","penalty":0.5,"note":"Processed dairy ingredient."},
+  "MILK SOLIDS": {"name":"Milk Solids","penalty":0.5,"note":"Processed dairy ingredient."},
+
+  "EMULSIFIER": {"name":"Emulsifier","penalty":0.3,"note":"Food processing additive."},
+  "STABILIZER": {"name":"Stabilizer","penalty":0.3,"note":"Food processing additive."},
+  "THICKENER": {"name":"Thickener","penalty":0.3,"note":"Food processing additive."},
+
+  "PRESERVATIVE": {"name":"Preservative","penalty":0.5,"note":"Added preservative."},
+  "SODIUM BENZOATE": {"name":"Sodium Benzoate","penalty":1,"note":"Preservative."},
+  "POTASSIUM SORBATE": {"name":"Potassium Sorbate","penalty":0.5,"note":"Preservative."},
+
+  "BHA": {"name":"BHA","penalty":1,"note":"Synthetic antioxidant."},
+  "BHT": {"name":"BHT","penalty":1,"note":"Synthetic antioxidant."},
+  "TBHQ": {"name":"TBHQ","penalty":0.5,"note":"Synthetic antioxidant."},
+
+  "MSG": {"name":"MSG","penalty":0.5,"note":"Flavour enhancer."},
+
+  "CAFFEINE": {"name":"Added Caffeine","penalty":0.5,"note":"Added stimulant."},
+
+  "MONO DIGLYCERIDES": {"name":"Mono Diglycerides","penalty":0.5,"note":"Processed emulsifier."},
+  "PGPR": {"name":"PGPR","penalty":0.5,"note":"Processed emulsifier."},
+
+  "ACESULFAME K": {"name":"Acesulfame K","penalty":0.5,"note":"Artificial sweetener."},
+  "ASPARTAME": {"name":"Aspartame","penalty":0.5,"note":"Artificial sweetener."},
+  "SUCRALOSE": {"name":"Sucralose","penalty":0.5,"note":"Artificial sweetener."}
+}

@@ -1,0 +1,55 @@
+{
+  "Chocolate & Confectionery": [
+    "CHOCOLATE",
+    "COCOA",
+    "COCOA MASS",
+    "COCOA BUTTER",
+    "KITKAT",
+    "WAFER",
+    "PERK",
+    "MUNCH"
+  ],
+
+  "Chips & Fried Snacks": [
+    "POTATO",
+    "PALMOLEIN",
+    "CHIPS",
+    "KURKURE",
+    "NAMKEEN",
+    "BINGO"
+  ],
+
+  "Instant Noodles": [
+    "NOODLES",
+    "MAGGI",
+    "RAMEN",
+    "TASTEMAKER"
+  ],
+
+  "Biscuits & Cookies": [
+    "BISCUIT",
+    "COOKIE",
+    "CREAM BISCUIT",
+    "BOURBON"
+  ],
+
+  "Protein/Nut Snacks": [
+    "ALMOND",
+    "PEANUT",
+    "CASHEW",
+    "CHICKPEA",
+    "ROASTED CHANA"
+  ],
+
+  "Makhana Snacks": [
+    "MAKHANA",
+    "FOX NUT"
+  ],
+
+  "Soft Drinks": [
+    "CARBONATED",
+    "COLA",
+    "SOFT DRINK",
+    "SODA"
+  ]
+}
