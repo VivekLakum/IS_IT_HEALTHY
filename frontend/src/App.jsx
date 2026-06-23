@@ -91,7 +91,7 @@ const INGREDIENT_RULES = [
   {
     match: (t) => t.includes("msg") || t.includes("glutamate") || t.includes("621") || t.includes("e621") || t.includes("yeast extract"),
     type: "additive",
-    item: { name: "Monosodium Glutamate", code: "INS 621", note: "Flavor enhancer that overstimulates neurotransmitters, potentially causing headaches and cravings." },
+    item: { name: "Monosodium Glutamate", code: "INS 621", note: "Flavor enhancer that overstimulates neurotransmitters, potentially causing headaches and cravings and Thristy." },
     deduction: 1.5, factor: "Excitotoxic Flavor Enhancer"
   },
   {
